@@ -11,6 +11,16 @@
       text-align: center;
       padding: 50px;
     }
+	<div style="position: absolute; top: 20px; right: 30px;">
+		<input
+		  type="text"
+		  id="searchInput"
+		  placeholder="🔍 搜尋卡片..."
+		  style="padding: 10px; font-size: 16px; border-radius: 8px; border: none; width: 200px;"
+		  oninput="handleSearch(this.value)"
+	    />
+	    <div id="searchResults" style="background-color: #222; color: #0ff; margin-top: 5px; border-radius: 8px; max-height: 300px; overflow-y: auto; font-size: 14px; display: none; padding: 10px;"></div>
+	 </div>
     h1 {
       font-size: 36px;
       margin-bottom: 40px;
@@ -293,6 +303,38 @@
 
     animate();
   }
+  
+  function handleSearch(keyword) {
+	const resultsDiv = document.getElementById("searchResults");
+	const lowerKeyword = keyword.toLowerCase().trim();
+
+	if (!lowerKeyword) {
+		resultsDiv.style.display = "none";
+		resultsDiv.innerHTML = "";
+		return;
+	}
+
+  // 合併所有卡池
+  const allCards = [
+    ...pool,
+    ...racePool,
+    ...WeapenPool,
+    ...TalentPool,
+    ...PlacePool,
+    ...EventPool,
+    ...SummonPool,
+  ];
+
+  const matches = allCards.filter(item => item.toLowerCase().includes(lowerKeyword));
+
+  if (matches.length === 0) {
+    resultsDiv.innerHTML = "<em>沒有找到符合的結果</em>";
+  } else {
+    resultsDiv.innerHTML = matches.map(match => `<div>• ${match}</div>`).join("");
+  }
+
+  resultsDiv.style.display = "block";
+}
 </script>
 
 </body>
