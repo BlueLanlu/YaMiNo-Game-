@@ -86,6 +86,8 @@
       padding: 10px;
       width: 200px;
     }
+	
+	
   </style>
 </head>
 <body>
@@ -150,8 +152,13 @@
     <button class="drawBtn" onclick="drawCard('result9', SummonPool, this)">隨便抽!!!</button>
     <div class="result" id="result9"></div>
   </div>
-
-
+  
+  <div id="customSearchContainer" style="position: fixed; bottom: 20px; right: 30px; text-align: left; z-index: 999;">
+    <input type="text" id="customSearchInput" placeholder="🔍 搜尋自定清單..." oninput="handleCustomSearch(this.value)" 
+         style="padding:10px;font-size:16px;border-radius:8px;border:none;width:200px;">
+    <div id="customSearchResults" style="background-color:#222;color:#0ff;margin-top:5px;border-radius:8px;max-height:300px;overflow-y:auto;font-size:14px;display:none;padding:10px;width:200px;"></div>
+  </div>
+  
 <script>
   const pool = [
     "無下限術式.赫 (短距離傳送)(三回合一次)(特殊)(S)",
@@ -359,6 +366,36 @@
 
      resultsDiv.style.display = "block";
    }
+   
+   const customList = [
+  "斬月", "漆黑之刃", "魔王的詛咒", "蘿莉控", "獸耳控", "比基尼戰士", "史萊姆之王",
+  "影分身術", "變身術", "高達變形", "情緒操控", "時光機", "小當家炒飯", "重力法則"
+   ];
+
+// 自定搜尋邏輯
+   function handleCustomSearch(keyword) {
+	const resultsDiv = document.getElementById("customSearchResults");
+	const lowerKeyword = keyword.toLowerCase().trim();
+
+	if (!lowerKeyword) {
+		resultsDiv.style.display = "none";
+		resultsDiv.innerHTML = "";
+		return;
+   }
+
+   const matches = customList.filter(item =>
+		item.toLowerCase().includes(lowerKeyword)
+   );
+
+   resultsDiv.innerHTML =
+	matches.length === 0
+		? "<em>沒有找到符合的結果</em>"
+		: matches.map(match => `<div>• ${match}</div>`).join("");
+
+	resultsDiv.style.display = "block";
+   }
+
+   
 </script>
 
 </body>
