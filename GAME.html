@@ -1,8 +1,9 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <!-- === [新增] 響應式設計的關鍵 Meta 標籤 === -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>YaMiNo Gamoe! 抽卡漸慢動畫</title>
   <style>
     body {
@@ -11,6 +12,14 @@
       color: #fff;
       text-align: center;
       padding: 50px;
+    }
+    
+    /* === [新增] 用於 Flexbox 佈局的容器 === */
+    #main-container {
+        display: flex;
+        flex-wrap: wrap; /* 允許項目換行 */
+        justify-content: center; /* 水平居中 */
+        align-items: flex-start; /* 頂部對齊 */
     }
 
     h1 {
@@ -89,97 +98,53 @@
     }
 
     /* 管理功能區塊的樣式 */
-    .management-section {
-        width: 350px; 
-    }
-
-    .management-section input, .management-section select {
-        width: 95%;
-        padding: 12px;
-        font-size: 16px;
-        border-radius: 8px;
-        border: 1px solid #555;
-        background-color: #333;
-        color: #fff;
-        margin-bottom: 15px;
-    }
-
+    .management-section { width: 350px; }
+    .management-section input, .management-section select { width: 95%; padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #555; background-color: #333; color: #fff; margin-bottom: 15px; }
     .management-section select { cursor: pointer; }
+    .management-section h3 { margin-top: 20px; margin-bottom: 15px; color: #00ffc8; font-size: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; }
+    .management-section .message { min-height: 24px; margin-top: 15px; font-size: 16px; font-weight: bold; transition: opacity 0.5s; }
+    .control-disabled { cursor: not-allowed; background-color: #555 !important; opacity: 0.6; }
     
-    .management-section h3 {
-        margin-top: 20px;
-        margin-bottom: 15px;
-        color: #00ffc8;
-        font-size: 20px;
-        border-bottom: 1px solid #444;
-        padding-bottom: 10px;
-    }
+    /* 彈出式視窗 (Modal) 的樣式 */
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); }
+    .modal-content { background-color: #2a2a2a; margin: 10% auto; padding: 25px; border: 1px solid #888; border-radius: 15px; width: 80%; max-width: 700px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+    .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+    .close-btn:hover, .close-btn:focus { color: white; text-decoration: none; }
+    #poolListContainer { max-height: 60vh; overflow-y: auto; text-align: left; }
+    #poolListContainer h4 { color: #00ffc8; border-bottom: 1px solid #555; padding-bottom: 8px; margin-top: 20px; }
+    #poolListContainer ul { list-style-type: none; padding-left: 10px; }
+    #poolListContainer li { padding: 5px 0; }
 
-    .management-section .message {
-        min-height: 24px;
-        margin-top: 15px;
-        font-size: 16px;
-        font-weight: bold;
-        transition: opacity 0.5s;
-    }
-
-    /* 禁用按鈕和下拉選單的樣式 */
-    .control-disabled {
-        cursor: not-allowed;
-        background-color: #555 !important;
-        opacity: 0.6;
-    }
-    
-    /* === [新增] 彈出式視窗 (Modal) 的樣式 === */
-    .modal {
-        display: none; /* 預設隱藏 */
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto; /* 當內容過多時可以滾動 */
-        background-color: rgba(0,0,0,0.7); /* 半透明黑色背景 */
-    }
-    .modal-content {
-        background-color: #2a2a2a;
-        margin: 10% auto;
-        padding: 25px;
-        border: 1px solid #888;
-        border-radius: 15px;
-        width: 80%;
-        max-width: 700px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-    }
-    .close-btn {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .close-btn:hover, .close-btn:focus {
-        color: white;
-        text-decoration: none;
-    }
-    #poolListContainer {
-        max-height: 60vh; /* 列表最大高度為視窗的60% */
-        overflow-y: auto; /* 內容超出時顯示滾動條 */
-        text-align: left;
-    }
-    #poolListContainer h4 {
-        color: #00ffc8;
-        border-bottom: 1px solid #555;
-        padding-bottom: 8px;
-        margin-top: 20px;
-    }
-    #poolListContainer ul {
-        list-style-type: none;
-        padding-left: 10px;
-    }
-    #poolListContainer li {
-        padding: 5px 0;
+    /* === [新增] 媒體查詢：當螢幕寬度小於等於 768px 時套用以下樣式 === */
+    @media (max-width: 768px) {
+        body {
+            padding: 20px 10px; /* 減少頁面邊距 */
+        }
+        h1 {
+            font-size: 28px; /* 縮小主標題字體 */
+        }
+        .card-section, .management-section {
+            width: 90%; /* 讓卡片寬度佔滿大部分螢幕 */
+            margin: 15px auto; /* 調整邊距 */
+        }
+        /* 讓固定位置的搜尋框變為正常排版 */
+        #searchContainer, #customSearchContainer {
+            position: static;
+            width: 90%;
+            margin: 0 auto 20px;
+        }
+        #searchInput, #customSearchInput {
+            width: 100%;
+            box-sizing: border-box; /* 確保 padding 不會讓寬度超標 */
+        }
+        #searchResults, #customSearchResults {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .modal-content {
+            width: 90%;
+            margin: 20px auto; /* 調整彈出視窗位置 */
+        }
     }
 	
   </style>
@@ -193,101 +158,99 @@
   
   <h1>🎴 YaMiNo Gamoe! 🎴</h1>
 
-  <!-- 管理區塊 -->
-  <div class="card-section management-section">
-    <h2>✨ 管理卡池 ✨</h2>
-
-    <!-- [修改] 新增一個查看列表的按鈕 -->
-    <button class="drawBtn" style="width:100%; margin-bottom: 20px; background-color: #007bff;" onclick="openPoolListModal()">📜 查看所有卡池列表 📜</button>
-
-    <h3>新增項目</h3>
-    <input type="text" id="newItemInput" placeholder="輸入新項目名稱...">
-    <select id="addPoolSelector">
-        <option value="" disabled selected>-- 選擇要加入的卡池 --</option>
-        <option value="pool">能力</option>
-        <option value="racePool">種族</option>
-        <option value="WeapenPool">武器</option>
-        <option value="TalentPool">特殊天賦</option>
-        <option value="PlacePool">地形</option>
-        <option value="EventPool">突發事件</option>
-        <option value="SummonPool">召喚物</option>
-    </select>
-    <button class="drawBtn" onclick="addItemToPool()">確認新增</button>
-    <div id="addResult" class="message"></div>
+  <!-- === [新增] 包裹所有卡片的 Flex 容器 === -->
+  <div id="main-container">
+      <!-- 管理區塊 -->
+      <div class="card-section management-section">
+        <h2>✨ 管理卡池 ✨</h2>
+        <button class="drawBtn" style="width:100%; margin-bottom: 20px; background-color: #007bff;" onclick="openPoolListModal()">📜 查看所有卡池列表 📜</button>
+        <h3>新增項目</h3>
+        <input type="text" id="newItemInput" placeholder="輸入新項目名稱...">
+        <select id="addPoolSelector">
+            <option value="" disabled selected>-- 選擇要加入的卡池 --</option>
+            <option value="pool">能力</option>
+            <option value="racePool">種族</option>
+            <option value="WeapenPool">武器</option>
+            <option value="TalentPool">特殊天賦</option>
+            <option value="PlacePool">地形</option>
+            <option value="EventPool">突發事件</option>
+            <option value="SummonPool">召喚物</option>
+        </select>
+        <button class="drawBtn" onclick="addItemToPool()">確認新增</button>
+        <div id="addResult" class="message"></div>
+        <hr style="border-color: #444; margin: 30px 0;">
+        <h3>移除項目</h3>
+        <select id="removePoolSelector" onchange="populateRemoveItems()">
+            <option value="" disabled selected>-- 1. 先選擇卡池 --</option>
+            <option value="pool">能力</option>
+            <option value="racePool">種族</option>
+            <option value="WeapenPool">武器</option>
+            <option value="TalentPool">特殊天賦</option>
+            <option value="PlacePool">地形</option>
+            <option value="EventPool">突發事件</option>
+            <option value="SummonPool">召喚物</option>
+        </select>
+        <select id="itemToRemoveSelector" disabled>
+            <option value="">-- 2. 再選擇要移除的項目 --</option>
+        </select>
+        <button id="removeItemBtn" class="drawBtn control-disabled" onclick="removeItemFromPool()" disabled>確認移除</button>
+        <div id="removeResult" class="message"></div>
+      </div>
     
-    <hr style="border-color: #444; margin: 30px 0;">
-
-    <h3>移除項目</h3>
-    <select id="removePoolSelector" onchange="populateRemoveItems()">
-        <option value="" disabled selected>-- 1. 先選擇卡池 --</option>
-        <option value="pool">能力</option>
-        <option value="racePool">種族</option>
-        <option value="WeapenPool">武器</option>
-        <option value="TalentPool">特殊天賦</option>
-        <option value="PlacePool">地形</option>
-        <option value="EventPool">突發事件</option>
-        <option value="SummonPool">召喚物</option>
-    </select>
-    <select id="itemToRemoveSelector" disabled>
-        <option value="">-- 2. 再選擇要移除的項目 --</option>
-    </select>
-    <button id="removeItemBtn" class="drawBtn control-disabled" onclick="removeItemFromPool()" disabled>確認移除</button>
-    <div id="removeResult" class="message"></div>
-  </div>
-
-  <div class="card-section">
-    <h2>卡池一：能力1</h2>
-    <button class="drawBtn" onclick="drawCard('result1', pool, this)">DRAW!!!</button>
-    <div class="result" id="result1"></div>
-  </div>
-
-  <div class="card-section">
-    <h2>卡池二：能力2</h2>
-    <button class="drawBtn" onclick="drawCard('result2', pool, this)">我叫你抽!!!</button>
-    <div class="result" id="result2"></div>
-  </div>
-
-  <div class="card-section">
-    <h2>卡池三：能力3</h2>
-    <button class="drawBtn" onclick="drawCard('result3', pool, this)">再抽!!!</button>
-    <div class="result" id="result3"></div>
-  </div>
-
-  <div class="card-section">
-    <h2>種族抽取</h2>
-    <button class="drawBtn" onclick="drawCard('result4', racePool, this)">抽種族!!!</button>
-    <div class="result" id="result4"></div>
-  </div>
-  
-  <div class="card-section">
-    <h2>武器</h2>
-    <button class="drawBtn" onclick="drawCard('result5', WeapenPool, this)">抽武器!!!</button>
-    <div class="result" id="result5"></div>
-  </div>
-  
-  <div class="card-section">
-    <h2>特殊天賦</h2>
-    <button class="drawBtn" onclick="drawCard('result6', TalentPool, this)">抽天賦!!!</button>
-    <div class="result" id="result6"></div>
-  </div>
-  
-  <div class="card-section">
-    <h2>地形</h2>
-    <button class="drawBtn" onclick="drawCard('result7', PlacePool, this)">抽地形!!!</button>
-    <div class="result" id="result7"></div>
-  </div>
-  
-  <div class="card-section">
-    <h2>突發事件</h2>
-    <button class="drawBtn" onclick="drawCard('result8', EventPool, this)">抽事件!!!</button>
-    <div class="result" id="result8"></div>
-  </div>
-  
-  <div class="card-section">
-    <h2>召喚物</h2>
-    <button class="drawBtn" onclick="drawCard('result9', SummonPool, this)">隨便抽!!!</button>
-    <div class="result" id="result9"></div>
-  </div>
+      <div class="card-section">
+        <h2>卡池一：能力1</h2>
+        <button class="drawBtn" onclick="drawCard('result1', pool, this)">DRAW!!!</button>
+        <div class="result" id="result1"></div>
+      </div>
+    
+      <div class="card-section">
+        <h2>卡池二：能力2</h2>
+        <button class="drawBtn" onclick="drawCard('result2', pool, this)">我叫你抽!!!</button>
+        <div class="result" id="result2"></div>
+      </div>
+    
+      <div class="card-section">
+        <h2>卡池三：能力3</h2>
+        <button class="drawBtn" onclick="drawCard('result3', pool, this)">再抽!!!</button>
+        <div class="result" id="result3"></div>
+      </div>
+    
+      <div class="card-section">
+        <h2>種族抽取</h2>
+        <button class="drawBtn" onclick="drawCard('result4', racePool, this)">抽種族!!!</button>
+        <div class="result" id="result4"></div>
+      </div>
+      
+      <div class="card-section">
+        <h2>武器</h2>
+        <button class="drawBtn" onclick="drawCard('result5', WeapenPool, this)">抽武器!!!</button>
+        <div class="result" id="result5"></div>
+      </div>
+      
+      <div class="card-section">
+        <h2>特殊天賦</h2>
+        <button class="drawBtn" onclick="drawCard('result6', TalentPool, this)">抽天賦!!!</button>
+        <div class="result" id="result6"></div>
+      </div>
+      
+      <div class="card-section">
+        <h2>地形</h2>
+        <button class="drawBtn" onclick="drawCard('result7', PlacePool, this)">抽地形!!!</button>
+        <div class="result" id="result7"></div>
+      </div>
+      
+      <div class="card-section">
+        <h2>突發事件</h2>
+        <button class="drawBtn" onclick="drawCard('result8', EventPool, this)">抽事件!!!</button>
+        <div class="result" id="result8"></div>
+      </div>
+      
+      <div class="card-section">
+        <h2>召喚物</h2>
+        <button class="drawBtn" onclick="drawCard('result9', SummonPool, this)">隨便抽!!!</button>
+        <div class="result" id="result9"></div>
+      </div>
+  </div> <!-- === 結束 #main-container === -->
   
   <div id="customSearchContainer" style="position: fixed; bottom: 20px; right: 30px; text-align: left; z-index: 999;">
     <input type="text" id="customSearchInput" placeholder="🔍 搜尋自定清單..." oninput="handleCustomSearch(this.value)" 
@@ -295,7 +258,7 @@
     <div id="customSearchResults" style="background-color:#222;color:#0ff;margin-top:5px;border-radius:8px;max-height:300px;overflow-y:auto;font-size:14px;display:none;padding:10px;width:200px;"></div>
   </div>
 
-  <!-- === [新增] 彈出式視窗的 HTML 結構 === -->
+  <!-- 彈出式視窗的 HTML 結構 -->
   <div id="poolListModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closePoolListModal()">&times;</span>
@@ -319,68 +282,14 @@
   function drawCard(resultId, cardArray, btn) { /* ... (此處程式碼不變) ... */ if(timers[resultId]) return; const resultElem = document.getElementById(resultId); resultElem.textContent = ""; btn.style.transition = 'transform 0.1s ease'; btn.style.transform = 'translateX(10px)'; setTimeout(() => { btn.style.transform = 'translateX(0px)'; }, 100); let totalSteps = 15, step = 0; const finalCard = cardArray[Math.floor(Math.random() * cardArray.length)]; function animate() { if(step >= totalSteps) { let text = finalCard; if(text.length > 10) { text = text.slice(0, 10) + '\n' + text.slice(10); } resultElem.textContent = text; timers[resultId] = null; return; } resultElem.textContent = cardArray[Math.floor(Math.random() * cardArray.length)]; let delay = Math.floor(30 * Math.pow(1.15, step)); timers[resultId] = setTimeout(() => { step++; animate(); }, delay); } animate(); }
    function handleSearch(keyword) { /* ... (此處程式碼不變) ... */ const resultsDiv = document.getElementById("searchResults"); const lowerKeyword = keyword.toLowerCase().trim(); if (!lowerKeyword) { resultsDiv.style.display = "none"; resultsDiv.innerHTML = ""; return; } const allCards = [ ...pool, ...racePool, ...WeapenPool, ...TalentPool, ...PlacePool, ...EventPool, ...SummonPool ]; const matches = allCards.filter(item => item.toLowerCase().includes(lowerKeyword)); resultsDiv.innerHTML = matches.length === 0 ? "<em>沒有找到符合的結果</em>" : matches.map(match => `<div>• ${match}</div>`).join(""); resultsDiv.style.display = "block"; }
    function handleCustomSearch(keyword) { /* ... (此處程式碼不變) ... */ const resultsDiv = document.getElementById("customSearchResults"); const lowerKeyword = keyword.toLowerCase().trim(); if (!lowerKeyword) { resultsDiv.style.display = "none"; resultsDiv.innerHTML = ""; return; } const matches = customList.filter(item => item.toLowerCase().includes(lowerKeyword)); resultsDiv.innerHTML = matches.length === 0 ? "<em>沒有找到符合的結果</em>" : matches.map(match => `<div>• ${match}</div>`).join(""); resultsDiv.style.display = "block"; }
-
-   // --- 卡池管理相關函式 ---
    function getPoolByName(poolName) { switch (poolName) { case 'pool': return pool; case 'racePool': return racePool; case 'WeapenPool': return WeapenPool; case 'TalentPool': return TalentPool; case 'PlacePool': return PlacePool; case 'EventPool': return EventPool; case 'SummonPool': return SummonPool; default: return null; } }
    function addItemToPool() { /* ... (此處程式碼不變) ... */ const newItemInput = document.getElementById('newItemInput'); const poolSelector = document.getElementById('addPoolSelector'); const addResultDiv = document.getElementById('addResult'); const itemName = newItemInput.value.trim(); const selectedPoolName = poolSelector.value; if (!itemName) { addResultDiv.textContent = '錯誤：項目名稱不能為空！'; addResultDiv.style.color = '#dc3545'; return; } if (!selectedPoolName) { addResultDiv.textContent = '錯誤：請選擇一個卡池！'; addResultDiv.style.color = '#dc3545'; return; } const targetPool = getPoolByName(selectedPoolName); if(targetPool) { targetPool.push(itemName); addResultDiv.textContent = `成功將「${itemName}」加入卡池！`; addResultDiv.style.color = '#28a745'; newItemInput.value = ''; setTimeout(() => { addResultDiv.textContent = ''; }, 3000); } }
    function populateRemoveItems() { /* ... (此處程式碼不變) ... */ const poolSelector = document.getElementById('removePoolSelector'); const itemSelector = document.getElementById('itemToRemoveSelector'); const removeBtn = document.getElementById('removeItemBtn'); const selectedPoolName = poolSelector.value; itemSelector.innerHTML = '<option value="">-- 2. 再選擇要移除的項目 --</option>'; if (!selectedPoolName) { itemSelector.disabled = true; removeBtn.disabled = true; removeBtn.classList.add('control-disabled'); return; } const targetPool = getPoolByName(selectedPoolName); if (targetPool && targetPool.length > 0) { targetPool.forEach(item => { const option = document.createElement('option'); option.value = item; option.textContent = item; itemSelector.appendChild(option); }); itemSelector.disabled = false; removeBtn.disabled = false; removeBtn.classList.remove('control-disabled'); } else { itemSelector.disabled = true; removeBtn.disabled = true; removeBtn.classList.add('control-disabled'); } }
    function removeItemFromPool() { /* ... (此處程式碼不變) ... */ const poolSelector = document.getElementById('removePoolSelector'); const itemSelector = document.getElementById('itemToRemoveSelector'); const removeResultDiv = document.getElementById('removeResult'); const selectedPoolName = poolSelector.value; const selectedItemName = itemSelector.value; if (!selectedPoolName) { removeResultDiv.textContent = '錯誤：請先選擇卡池！'; removeResultDiv.style.color = '#dc3545'; return; } if (!selectedItemName) { removeResultDiv.textContent = '錯誤：請選擇要移除的項目！'; removeResultDiv.style.color = '#dc3545'; return; } const targetPool = getPoolByName(selectedPoolName); const itemIndex = targetPool.indexOf(selectedItemName); if (itemIndex > -1) { targetPool.splice(itemIndex, 1); removeResultDiv.textContent = `成功將「${selectedItemName}」移除！`; removeResultDiv.style.color = '#28a745'; populateRemoveItems(); setTimeout(() => { removeResultDiv.textContent = ''; }, 3000); } else { removeResultDiv.textContent = '錯誤：找不到該項目，可能已被移除。'; removeResultDiv.style.color = '#dc3545'; } }
-
-   /* === [新增] 彈出式視窗相關的函式 === */
-    const modal = document.getElementById('poolListModal');
-
-    // 打開視窗並動態生成列表
-    function openPoolListModal() {
-        const container = document.getElementById('poolListContainer');
-        container.innerHTML = ''; // 每次打開前都清空舊內容
-
-        const allPools = {
-            '能力': pool, '種族': racePool, '武器': WeapenPool,
-            '特殊天賦': TalentPool, '地形': PlacePool, '突發事件': EventPool,
-            '召喚物': SummonPool
-        };
-
-        for (const poolTitle in allPools) {
-            const poolArray = allPools[poolTitle];
-            
-            // 創建標題
-            const titleElem = document.createElement('h4');
-            titleElem.textContent = `${poolTitle} (${poolArray.length} 項)`;
-            container.appendChild(titleElem);
-
-            // 創建列表
-            const listElem = document.createElement('ul');
-            if(poolArray.length > 0) {
-                poolArray.forEach(item => {
-                    const itemElem = document.createElement('li');
-                    itemElem.textContent = item;
-                    listElem.appendChild(itemElem);
-                });
-            } else {
-                 const emptyElem = document.createElement('li');
-                 emptyElem.textContent = '此卡池目前為空';
-                 emptyElem.style.fontStyle = 'italic';
-                 emptyElem.style.opacity = '0.6';
-                 listElem.appendChild(emptyElem);
-            }
-            container.appendChild(listElem);
-        }
-
-        modal.style.display = 'block'; // 顯示視窗
-    }
-
-    // 關閉視窗
-    function closePoolListModal() {
-        modal.style.display = 'none';
-    }
-
-    // 當使用者點擊視窗外部區域時，也關閉視窗
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            closePoolListModal();
-        }
-    }
-
+   const modal = document.getElementById('poolListModal');
+    function openPoolListModal() { /* ... (此處程式碼不變) ... */ const container = document.getElementById('poolListContainer'); container.innerHTML = ''; const allPools = { '能力': pool, '種族': racePool, '武器': WeapenPool, '特殊天賦': TalentPool, '地形': PlacePool, '突發事件': EventPool, '召喚物': SummonPool }; for (const poolTitle in allPools) { const poolArray = allPools[poolTitle]; const titleElem = document.createElement('h4'); titleElem.textContent = `${poolTitle} (${poolArray.length} 項)`; container.appendChild(titleElem); const listElem = document.createElement('ul'); if(poolArray.length > 0) { poolArray.forEach(item => { const itemElem = document.createElement('li'); itemElem.textContent = item; listElem.appendChild(itemElem); }); } else { const emptyElem = document.createElement('li'); emptyElem.textContent = '此卡池目前為空'; emptyElem.style.fontStyle = 'italic'; emptyElem.style.opacity = '0.6'; listElem.appendChild(emptyElem); } container.appendChild(listElem); } modal.style.display = 'block'; }
+    function closePoolListModal() { /* ... (此處程式碼不變) ... */ modal.style.display = 'none'; }
+    window.onclick = function(event) { /* ... (此處程式碼不變) ... */ if (event.target == modal) { closePoolListModal(); } }
 </script>
 
 </body>
