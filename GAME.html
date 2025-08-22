@@ -419,22 +419,20 @@
 
 	  const line = subtitles[currentLine];
 	  subtitleElem.textContent += line[currentChar];
-
 	  currentChar++;
 
 	  if (currentChar < line.length) {
-		setTimeout(typeSubtitle, 50);
-	  } else {
-		subtitleElem.textContent += "\n";
-		currentLine++;
-		currentChar = 0;
-		setTimeout(typeSubtitle, 500);
+		 setTimeout(typeSubtitle, 50);
+	  }  else {
+		 subtitleElem.textContent += "\n"; // 換行
+		 currentLine++;
+		 currentChar = 0;
+		 setTimeout(typeSubtitle, 500); // 下一行延遲開始
 	  }
 	}
 
-// 啟動動畫
+// ✅ 呼叫動畫開始
 typeSubtitle();
-
 </script>
 
 </body>
