@@ -181,24 +181,7 @@
     #poolListContainer li {
         padding: 5px 0;
     }
-    .subtitle-section {
-	  margin-top: 60px;
-	  text-align: center;
-	}
-
-	.subtitle-text {
-	  display: inline-block;
-	  background: rgba(0, 0, 0, 0.6);
-	  color: #fffacd;
-	  padding: 20px 40px;
-	  font-size: 20px;
-	  border-radius: 10px;
-	  text-shadow: 2px 2px 4px #000;
-	  font-weight: bold;
-	  line-height: 1.6;
-	  white-space: pre-line;
-	  min-height: 120px;
-	}
+    
 	
   </style>
 </head>
@@ -321,9 +304,6 @@
         <div id="poolListContainer"></div>
     </div>
 	
-  <div class="subtitle-section">
-    <div class="subtitle-text" id="subtitleText"></div>
-  </div>
   
   
 <script>
@@ -403,36 +383,7 @@
         }
     }
 	
-	const subtitles = [
-	  "製作人：庫伊特",
-	  "網頁設計：BLUE，龍頭",
-	  "清單資料：BLUE，龍頭，庫伊特",
-	  "特別感謝：龍頭，信夫，韓"
-	];
-
-	const subtitleElem = document.getElementById("subtitleText");
-	let currentLine = 0;
-	let currentChar = 0;
-
-	function typeSubtitle() {
-	  if (currentLine >= subtitles.length) return;
-
-	  const line = subtitles[currentLine];
-	  subtitleElem.textContent += line[currentChar];
-	  currentChar++;
-
-	  if (currentChar < line.length) {
-		 setTimeout(typeSubtitle, 50);
-	  }  else {
-		 subtitleElem.textContent += "\n"; // 換行
-		 currentLine++;
-		 currentChar = 0;
-		 setTimeout(typeSubtitle, 500); // 下一行延遲開始
-	  }
-	}
-
-// ✅ 呼叫動畫開始
-typeSubtitle();
+	
 </script>
 
 </body>
